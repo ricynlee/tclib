@@ -1,0 +1,9 @@
+flash:
+    - mt25
+    - mt35
+speed:
+    - 30:0
+    - 60
+encrypt:speed==30
+    - none
+    - aes128
