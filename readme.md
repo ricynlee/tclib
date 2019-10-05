@@ -27,6 +27,7 @@ encryption:
   - aes256
 ```
 To make it easier to describe the following details, some terms are introduced here.
+
 Term | Example | Note
 -|-|-
 key | `flash`, `encrypted` | Consists of letters (case-sensitive), digits, underscores
@@ -34,7 +35,7 @@ value | `4`, `30MHz`, `aes128` | Always regarded as a string/text
 feature | `speed=30MHz`, `encrypted=yes`
 combination | `flash=nand,wire=1,encrypted=yes`
 testcase | A full *combination* like `flash=nand,wire=1,speed=30MHz,encrypted=yes,encryption=aes128`
-condition | `0`(logical 0), `flash==nand`, `wire!=4`, `flash==nor || !(encrypted==yes && encryption==aes128)` | Before `==` (or `!=`) must come a *key*, and a **valid** *value* comes after
+condition | `0`(logical 0), `flash==nand`, `wire!=4`, `flash==nor \|\| !(encrypted==yes && encryption==aes128)` | Before `==` (or `!=`) must come a *key*, and a **valid** *value* comes after
 
 **tclib** parses the yamlite input, picks a *value* of each *key*, concatenates those *features* to form a *testcase*.
 **tclib** enumerates all possible *combinations*. For the yamlite above, there are 64 *testcases* in total.
@@ -97,6 +98,7 @@ encryption:
   - aes256
 ```
 为了简化后文描述,这里引入一些名词.
+
 名词 | 例子 | 注释
 -|-|-
 key | `flash`, `encrypted` | 由字(大小写敏感),数字和下划线组成
@@ -104,7 +106,7 @@ value | `4`, `30MHz`, `aes128` | 视为字符串/文本
 feature | `speed=30MHz`, `encrypted=yes`
 combination | `flash=nand,wire=1,encrypted=yes`
 testcase | 完整的*combination*,如`flash=nand,wire=1,speed=30MHz,encrypted=yes,encryption=aes128`
-condition | `0`(逻辑0), `flash==nand`, `wire!=4`, `flash==nor || !(encrypted==yes && encryption==aes128)` | 在`==`(或`!=`)之前务必为*key*,之后是**有效的***value*
+condition | `0`(逻辑0), `flash==nand`, `wire!=4`, `flash==nor \|\| !(encrypted==yes && encryption==aes128)` | 在`==`(或`!=`)之前务必为*key*,之后是**有效的***value*
 
 **tclib**解析输入的yamlite文件, 从各个*key*中选择一个*value*,串接这些*feature*从而得到*testcase*.
 **tclib**枚举所有可行的组合.对于上面的yamlite文件,共有64个*testcase*.
