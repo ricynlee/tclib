@@ -88,5 +88,5 @@ int main(int argc, char* argv[]){
         ofs.close();
     out = nullptr;
     
-    return 0;
+    return status;
 }
