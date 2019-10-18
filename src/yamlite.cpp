@@ -103,7 +103,7 @@ bool Yamlite::load(const string& filename){
     string line;
     smatch group;
     while(getline(ifs, line)){
-        if(regex_match(line, group, regex("^(\\w+) *\\: *(.*?) *$"))){ // Key
+        if(regex_match(line, group, regex("^(\\w+) *\\: *(.*?) *(?:#.*)?$"))){ // Key
             if(key_vec.size() && key_vec.back().value_num()==0){
                 // empty-valued option
                 key_vec.clear();
@@ -118,8 +118,7 @@ bool Yamlite::load(const string& filename){
             }
 
             append_key(group[1].str(), group[2].str());
-        } else if(regex_match(line, group, regex("^ *- *(\\w+) *$")) ||
-                  regex_match(line, group, regex("^ *- *(\\w+) *\\: *(.*?) *$"))){ // Value
+        } else if(regex_match(line, group, regex("^ *- *(\\w+) *(?:\\: *(.*?) *)?(?:#.*)?$"))){
             if(key_vec.size()==0){
                 // floating value
                 key_vec.clear();
@@ -129,7 +128,7 @@ bool Yamlite::load(const string& filename){
             if(key_vec.back().find_value(group[1].str()) != YAML_INVALID_INDEX)
                 // ignore duplicate value
                 continue;
-            key_vec.back().append_value(group[1].str(), group.size()>2 ? group[2].str() : "");
+            key_vec.back().append_value(group[1].str(), group[2].str());
         } else if(regex_match(line, group, regex("^ *(#.*)?$"))){
             // skip empty lines
         } else {
