@@ -260,9 +260,10 @@ bool Library::enumerate(tc_callback tc_handler){
             if(p->parent_value_index != INVALID_INDEX){
                 tc_dict[yaml.get_key(p->parent_option_index)] = yaml.get_key(p->parent_option_index).get_value(p->parent_value_index);
             }else if(tc_dict.find(yaml.get_key(p->parent_option_index))!=tc_dict.end()){
+                // remove var from dict if (p->parent_value_index != INVALID_INDEX)
                 tc_dict.erase(yaml.get_key(p->parent_option_index));
             }
-            if(current_option_index==yaml.key_num()){
+            if(current_option_index==yaml.key_num() && tc_dict.size()){
                 if(tc_handler != nullptr){
                     tc_handler(tc_dict);
                 }
