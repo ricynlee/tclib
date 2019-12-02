@@ -26,27 +26,38 @@ SOFTWARE.
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "yamlite.hpp"
 #include "tclib.hpp"
+#include "tclib-engine.hpp"
 using namespace std;
 
 ostream* out = &cout;
-
 void tc_print(const map<string, string>& tc_dict){
-    if(out == nullptr)
-        return;
-    for(map<string, string>::const_iterator it=tc_dict.cbegin(); it!=tc_dict.cend(); it++){
-        if(it==tc_dict.begin())
-            (*out)<<it->first<<'='<<it->second;
-        else
-            (*out)<<','<<it->first<<'='<<it->second;
+
+    (*out) << tc_dict.cbegin()->first;
+    (*out) << '=';
+    (*out) << tc_dict.cbegin()->second;
+
+    for(map<string, string>::const_iterator it=next(tc_dict.cbegin()); it!=tc_dict.cend(); it++){
+        (*out) << ',';
+        (*out) << it->first;
+        (*out) << '=';
+        (*out) << it->second;
     }
-    (*out)<<endl;
+
+    (*out) << '\n';
+
+    static int tc_cnt = 0;
+    tc_cnt++;
+    if((tc_cnt & 0xFFF) == 0)
+        if(out != &cout)
+            cout << tc_cnt << endl;
 }
 
 void help(void){
     cout<<
     "tclib (C) 2019 ricynlee" "\n"
+    "Built on " __DATE__ " " __TIME__ "\n"
+    "\n"
     "# Usage" "\n"
     "tclib yamlite-in [testcases-out]" "\n"
     <<endl;
@@ -55,13 +66,14 @@ void help(void){
 int main(int argc, char* argv[]){
     int status = 0;
     ofstream ofs;
+
     do{
         if(argc<2 || argc>3){
             help();
             status = 0;
             break;
         }
-        
+
         if(argc==3){
             ofs.open(argv[2]);
             if(ofs.is_open())
@@ -70,23 +82,23 @@ int main(int argc, char* argv[]){
                 cerr<<"[WARNING] Failed to access output file "<<'\"'<<argv[2]<<'\"'<<". Output is redirected to stdout."<<endl;
         }
 
-        Yamlite yaml;
-        if(!yaml.load(argv[1])){
+        Tclib lib;
+        if(!lib.open(argv[1])){
             cerr<<"[ERROR] Fail to load input file "<<'\"'<<argv[1]<<'\"'<<". Maybe the input file is not a valid yamlite file?"<<endl;
             status = (-1);
             break;
         }
-        Library lib(yaml);
-        if(!lib.enumerate(tc_print)){
-            cerr<<"An error occurred. Maybe a logical expression has a syntax error in the input file "<<'\"'<<argv[1]<<'\"'<<"?"<<endl;
+        TclibEnumEngine eng(lib);
+        if(!eng.enumerate(tc_print)){
+            cerr<<"[ERROR] Maybe a logical expression has a syntax error in the input file "<<'\"'<<argv[1]<<'\"'<<"?"<<endl;
             status = (-1);
             break;
         }
     }while(0);
-    
+
     if(ofs.is_open())
         ofs.close();
     out = nullptr;
-    
+
     return status;
 }

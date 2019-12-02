@@ -22,48 +22,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef _YAMLITE_H_
-#define _YAMLITE_H_
+#ifndef _TCLIB_ENG_H_
+#define _TCLIB_ENG_H_
 
 #include <vector>
 #include <string>
+#include <map>
+#include "tclib.hpp"
 
-#define YAML_INVALID_INDEX ((size_t)(-1))
+#define INVALID_INDEX ((size_t)(-1))
 
-class YamlValue: public std::string{
+class TclibEnumNode{
 private:
-    std::string value_tag;
+    size_t        parent_var_index;
+    size_t        parent_val_index;
 public:
-    const std::string& get_value_tag(void) const;
-public:
-    friend class YamlKey;
+    friend class TclibEnumEngine;
 };
 
-class YamlKey: public std::string{
+typedef void (*tc_callback)(const std::map<std::string, std::string>& tc_dict);
+
+class TclibEnumEngine{
 private:
-    std::vector<YamlValue>   value_vec;
-    YamlValue& append_value(const std::string& value, const std::string& value_tag);
-    std::string  key_tag;
+    typedef enum{
+        COND_FALSE = 0,
+        COND_TRUE = 1,
+        COND_UNCERTAIN = 2,
+        COND_ERROR = (-1),
+    } cond_t;
+private:
+    Tclib& tclib;
+    std::vector<size_t>                 var;
+    std::vector<std::list<cond_elem_t>> cond;
+    cond_t judge(std::list<cond_elem_t> expr);
 public:
-    YamlKey(size_t reserved_length=16);
-    size_t find_value(const std::string& value_string) const;
-    const YamlValue& get_value(size_t index) const;
-    const std::string& get_key_tag(void) const;
-    size_t value_num() const;
-public:
-    friend class Yamlite;
+    TclibEnumEngine(Tclib& lib) :tclib(lib) {
+        var.clear();
+        var.reserve(lib.size());
+        cond.clear();
+    }
+    bool enumerate(tc_callback tc_handler=nullptr);
 };
 
-class Yamlite{
-private:
-    std::vector<YamlKey> key_vec;
-    YamlKey& append_key(const std::string& name, const std::string& key_tag);
-public:
-    Yamlite(const std::string& filename=std::string(""), size_t reserved_length=32);
-    bool load(const std::string& filename);
-    size_t find_key(const std::string& key_string) const;
-    const YamlKey& get_key(size_t index) const;
-    size_t key_num() const;
-};
-
-#endif // _YAMLITE_H_
+#endif // _TCLIB_ENG_H_

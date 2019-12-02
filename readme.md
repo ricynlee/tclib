@@ -30,7 +30,7 @@ To make it easier to describe the following details, some terms are introduced h
 
 Term | Example | Note
 -|-|-
-key | `flash`, `encrypted` | Consists of letters (case-sensitive), digits, underscores
+key | `flash`, `encrypted` | Consists of letters (case-sensitive), underscores, and non-initial digits
 value | `4`, `30MHz`, `aes128` | Always regarded as a string/text
 feature | `speed=30MHz`, `encrypted=yes`
 combination | `flash=nand,wire=1,encrypted=yes`
