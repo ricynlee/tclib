@@ -55,13 +55,16 @@ private:
     std::vector<size_t>                 var;
     std::vector<std::list<cond_elem_t>> cond;
     cond_t judge(std::list<cond_elem_t> expr);
+    std::string enumerate_log;
 public:
-    TclibEnumEngine(Tclib& lib) :tclib(lib) {
+    TclibEnumEngine(Tclib& lib) :tclib(lib), log(enumerate_log) {
         var.clear();
         var.reserve(lib.size());
         cond.clear();
+        enumerate_log.clear();
     }
     bool enumerate(tc_callback tc_handler=nullptr);
+    const std::string& log;
 };
 
 #endif // _TCLIB_ENG_H_

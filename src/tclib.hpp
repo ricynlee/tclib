@@ -29,6 +29,7 @@ SOFTWARE.
 #include <map>
 #include <vector>
 #include <stdexcept>
+#include <cctype>
 
 typedef struct{
     int index; // var/val
@@ -53,12 +54,16 @@ private:
 public:
     friend class Tclib;
 public:
-    TclibVal() {
+    TclibVal():tag(val_tag){
         cond.clear();
     }
     const std::list<cond_elem_t>& constraint(void)const {
         return cond;
     }
+private:
+    std::string        val_tag;
+public:
+    const std::string& tag;
 };
 
 class TclibVar:public std::string{
@@ -69,7 +74,7 @@ private:
 public:
     friend class Tclib;
 public:
-    TclibVar() {
+    TclibVar():tag(var_tag) {
         cond.clear();
         val_lut.clear();
         val_vec.clear();
@@ -78,28 +83,34 @@ public:
     const std::list<cond_elem_t>& dependency(void)const {
         return cond;
     }
-    const TclibVal& operator[](int index)const {
-        if (index<0 || index>val_vec.size())
+    const TclibVal& operator[](size_t index)const {
+        if (index>val_vec.size())
             throw std::out_of_range("cannot find val");
         return val_vec[index];
     }
     int size()const {
         return val_vec.size();
     }
+private:
+    std::string        var_tag;
+public:
+    const std::string& tag;
 };
 
 class Tclib{
 private:
     std::vector<TclibVar>       var_vec;
     std::map<std::string, int>  var_lut;
+    std::string                 load_log;
 public:
-    Tclib() {
+    Tclib():log(load_log) {
         var_lut.clear();
         var_vec.clear();
         var_vec.reserve(32);
+        load_log.clear();
     }
-    const TclibVar& operator[](int index)const {
-        if (index<0 || index>var_vec.size())
+    const TclibVar& operator[](size_t index)const {
+        if (index>var_vec.size())
             throw std::out_of_range("cannot find var");
         return var_vec[index];
     }
@@ -107,109 +118,10 @@ public:
         return var_vec.size();
     }
 private:
-    bool parse_cond(const std::string& src, std::list<cond_elem_t>& dst) {
-        // TODO: save polish expr from the beginning?
-        int i = 0;
-        while (true) {
-            if (src[i] == '_' || isalpha(src[i])) {
-                std::string var, val;
-                var.assign(1, src[i++]);
-                while (src[i] == '_' || isalnum(src[i]))
-                    var.append(1, src[i++]);
-                dst.emplace_back();
-                try {
-                    dst.back().type = 'L';
-                    dst.back().index = var_lut.at(var);
-                }
-                catch (std::out_of_range) {
-                    return false;
-                }
-                while (src[i] == ' ')
-                    i++;
-                if (src[i] == '=' && src[i + 1] == '=') {
-                    dst.emplace_back();
-                    dst.back().type = '=';
-                    i += 2;
-                }
-                else if (src[i] == '!' && src[i + 1] == '=') {
-                    dst.emplace_back();
-                    dst.back().type = '~';
-                    i += 2;
-                }
-                else
-                    return false;
-                while (src[i] == ' ')
-                    i++;
-                if (src[i] == '_' || isalnum(src[i])) {
-                    val.assign(1, src[i++]);
-                    while (src[i] == '_' || isalnum(src[i]))
-                        val.append(1, src[i++]);
-                    dst.emplace_back();
-                    try {
-                        dst.back().type = 'R';
-                        dst.back().index = var_vec[var_lut.at(var)].val_lut.at(val);
-                    }
-                    catch (std::out_of_range) {
-                        return false;
-                    }
-                }
-                else
-                    return false;
-            }
-            else if (src[i] == '|') {
-                if (src[++i] != '|') {
-                    return false;
-                }
-                dst.emplace_back();
-                dst.back().type = '|';
-                i++;
-            }
-            else if (src[i] == '&') {
-                if (src[++i] != '&') {
-                    return false;
-                }
-                dst.emplace_back();
-                dst.back().type = '&';
-                i++;
-            }
-            else if (src[i] == '!') {
-                dst.emplace_back();
-                dst.back().type = '!';
-                i++;
-            }
-            else if (src[i] == '(') {
-                dst.emplace_back();
-                dst.back().type = '(';
-                i++;
-            }
-            else if (src[i] == ')') {
-                dst.emplace_back();
-                dst.back().type = ')';
-                i++;
-            }
-            else if (src[i] == '0') {
-                dst.emplace_back();
-                dst.back().type = '0';
-                i++;
-            }
-            else if (src[i] == '1') {
-                dst.emplace_back();
-                dst.back().type = '1';
-                i++;
-            }
-            else if (src[i] == '\0') {
-                return true;
-            }
-            else if (src[i] == ' ') {
-                i++;
-            }
-            else
-                return false;
-        }
-        return false; // should never reach this
-    }
+    bool parse_cond(const std::string& src, std::list<cond_elem_t>& dst);
 public:
-    bool open(const std::string& file);
+    const std::string& log;
+    bool load(const std::string& file_name);
 };
 
 #endif // _TCLIB_H_

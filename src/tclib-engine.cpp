@@ -42,7 +42,7 @@ TclibEnumEngine::cond_t TclibEnumEngine::judge(list<cond_elem_t> expr){
             if (prev(it)->type != 'L' || next(it)->type != 'R') {
                 return COND_ERROR;
             }
-            if (prev(it)->index >= var.size()) {
+            if (prev(it)->index >= (int)var.size()) {
                 it->type = '?';
             }
             else {
@@ -56,7 +56,7 @@ TclibEnumEngine::cond_t TclibEnumEngine::judge(list<cond_elem_t> expr){
             if (prev(it)->type != 'L' || next(it)->type != 'R') {
                 return COND_ERROR;
             }
-            if (prev(it)->index >= var.size()) {
+            if (prev(it)->index >= (int)var.size()) {
                 it->type = '?';
             }
             else {
@@ -164,6 +164,8 @@ TclibEnumEngine::cond_t TclibEnumEngine::judge(list<cond_elem_t> expr){
 
 bool TclibEnumEngine::enumerate(tc_callback tc_handler){
     if(tclib.size()==0){
+        enumerate_log.append("[ENUM ERROR] Empty test case library");
+        enumerate_log.append(1, '\n');
         return false;
     }
 
@@ -239,6 +241,9 @@ bool TclibEnumEngine::enumerate(tc_callback tc_handler){
             if(judge_result==COND_FALSE){
                 continue;
             }else if(judge_result==COND_ERROR){
+                enumerate_log.append("[ENUM ERROR] There are logical error(s) with a dependency/constraint.\n");
+                enumerate_log.append("Check ").append(tclib[n.parent_var_index]).append(": ").append(tclib[n.parent_var_index].tag).append(1, '\n');
+                enumerate_log.append("Check ").append(tclib[n.parent_var_index][n.parent_val_index]).append(": ").append(tclib[n.parent_var_index][n.parent_val_index]).append(1, '\n');
                 break;
             }else{ // TRUE or UNCERTAIN
                 if(judge_result==COND_TRUE){

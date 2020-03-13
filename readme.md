@@ -101,7 +101,7 @@ encryption:
 
 名词 | 例子 | 注释
 -|-|-
-key | `flash`, `encrypted` | 由字(大小写敏感),数字和下划线组成
+key | `flash`, `encrypted` | 由字母(大小写敏感),数字和下划线组成
 value | `4`, `30MHz`, `aes128` | 视为字符串/文本
 feature | `speed=30MHz`, `encrypted=yes`
 combination | `flash=nand,wire=1,encrypted=yes`

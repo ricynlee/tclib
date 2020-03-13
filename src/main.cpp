@@ -45,17 +45,11 @@ void tc_print(const map<string, string>& tc_dict){
     }
 
     (*out) << '\n';
-
-    static int tc_cnt = 0;
-    tc_cnt++;
-    if((tc_cnt & 0xFFF) == 0)
-        if(out != &cout)
-            cout << tc_cnt << endl;
 }
 
 void help(void){
     cout<<
-    "tclib (C) 2019 ricynlee" "\n"
+    "tclib (C) 2019~2020 ricynlee" "\n"
     "Built on " __DATE__ " " __TIME__ "\n"
     "\n"
     "# Usage" "\n"
@@ -83,14 +77,16 @@ int main(int argc, char* argv[]){
         }
 
         Tclib lib;
-        if(!lib.open(argv[1])){
-            cerr<<"[ERROR] Fail to load input file "<<'\"'<<argv[1]<<'\"'<<". Maybe the input file is not a valid yamlite file?"<<endl;
+        if(!lib.load(argv[1])){
+            cerr << "[ERROR] Failed to load input file " << '\"' << argv[1] << '\"' << endl;
+            cerr << lib.log;
             status = (-1);
             break;
         }
         TclibEnumEngine eng(lib);
         if(!eng.enumerate(tc_print)){
-            cerr<<"[ERROR] Maybe a logical expression has a syntax error in the input file "<<'\"'<<argv[1]<<'\"'<<"?"<<endl;
+            cerr << "[ERROR] Failed to generate test cases out of file " << '\"' << argv[1] << '\"' << endl;
+            cerr << eng.log;
             status = (-1);
             break;
         }
