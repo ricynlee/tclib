@@ -242,8 +242,8 @@ bool TclibEnumEngine::enumerate(tc_callback tc_handler){
                 continue;
             }else if(judge_result==COND_ERROR){
                 enumerate_log.append("[ENUM ERROR] There are logical error(s) with a dependency/constraint.\n");
-                enumerate_log.append("Check ").append(tclib[n.parent_var_index]).append(": ").append(tclib[n.parent_var_index].tag).append(1, '\n');
-                enumerate_log.append("Check ").append(tclib[n.parent_var_index][n.parent_val_index]).append(": ").append(tclib[n.parent_var_index][n.parent_val_index]).append(1, '\n');
+                enumerate_log.append("Current variable ").append(tclib[n.parent_var_index]).append(" w/ dependency: ").append(tclib[n.parent_var_index].tag).append(1, '\n');
+                enumerate_log.append("Current value ").append(tclib[n.parent_var_index][n.parent_val_index]).append(" w/ constraint: ").append(tclib[n.parent_var_index][n.parent_val_index].tag).append(1, '\n');
                 break;
             }else{ // TRUE or UNCERTAIN
                 if(judge_result==COND_TRUE){

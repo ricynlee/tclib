@@ -85,7 +85,7 @@ int main(int argc, char* argv[]){
         }
         TclibEnumEngine eng(lib);
         if(!eng.enumerate(tc_print)){
-            cerr << "[ERROR] Failed to generate test cases out of file " << '\"' << argv[1] << '\"' << endl;
+            cerr << "[ERROR] Failed to generate test cases out of library " << '\"' << argv[1] << '\"' << endl;
             cerr << eng.log;
             status = (-1);
             break;
