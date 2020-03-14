@@ -88,7 +88,7 @@ public:
             throw std::out_of_range("cannot find val");
         return val_vec[index];
     }
-    int size()const {
+    size_t size()const {
         return val_vec.size();
     }
 private:
@@ -114,7 +114,7 @@ public:
             throw std::out_of_range("cannot find var");
         return var_vec[index];
     }
-    int size()const {
+    size_t size()const {
         return var_vec.size();
     }
 private:

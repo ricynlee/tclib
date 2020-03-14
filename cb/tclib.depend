@@ -1,0 +1,36 @@
+# depslib dependency file v1.0
+1584119581 source:d:\tclib\src\main.cpp
+	<map>
+	<string>
+	<iostream>
+	<fstream>
+	"tclib.hpp"
+	"tclib-engine.hpp"
+
+1584158882 d:\tclib\src\tclib.hpp
+	<list>
+	<map>
+	<vector>
+	<stdexcept>
+	<cctype>
+
+1584158759 d:\tclib\src\tclib-engine.hpp
+	<vector>
+	<string>
+	<map>
+	"tclib.hpp"
+
+1584158906 source:d:\tclib\src\tclib-engine.cpp
+	<string>
+	<vector>
+	<queue>
+	<stack>
+	<map>
+	"tclib-engine.hpp"
+
+1584158836 source:d:\tclib\src\tclib.cpp
+	<cctype>
+	<fstream>
+	<string>
+	"tclib.hpp"
+

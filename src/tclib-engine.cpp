@@ -46,7 +46,7 @@ TclibEnumEngine::cond_t TclibEnumEngine::judge(list<cond_elem_t> expr){
                 it->type = '?';
             }
             else {
-                it->index = (var[prev(it)->index] == next(it)->index);
+                it->index = ((int)var[prev(it)->index] == next(it)->index);
                 it->type = it->index ? '1' : '0';
             }
             expr.erase(prev(it));
@@ -60,7 +60,7 @@ TclibEnumEngine::cond_t TclibEnumEngine::judge(list<cond_elem_t> expr){
                 it->type = '?';
             }
             else {
-                it->index = (var[prev(it)->index] != next(it)->index);
+                it->index = ((int)var[prev(it)->index] != next(it)->index);
                 it->type = it->index ? '1' : '0';
             }
             expr.erase(prev(it));
