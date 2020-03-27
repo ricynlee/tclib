@@ -29,162 +29,6 @@ SOFTWARE.
 
 using namespace std;
 
-static bool retrieve_var(const string& line, string& var, string& tag) {
-    size_t i = 0;
-    var.clear();
-    tag.clear();
-    if (line.length()==0 || (line[0] != '_' && !isalpha(line[0]))) {
-        return false;
-    }
-    // derive var name
-    var.assign(1, line[0]);
-    for (i = 1; i < line.length(); i++) {
-        if (line[i] == '_' || isalnum(line[i])) {
-            var.append(1, line[i]);
-        }
-        else if (line[i]==':' || line[i]==' ') {
-            break;
-        }
-        else {
-            return false;
-        }
-    }
-    if (i >= line.length()) {
-        return true;
-    }
-    // skip whitespaces (if any) following var name
-    for (; i < line.length(); i++) {
-        if (line[i] != ' ')
-            break;
-    }
-    if (i >= line.length()) {
-        return true;
-    }
-    // check for colon
-    if (line[i] == ':') {
-        // store tag and eliminate all whitespace in it
-        tag.clear();
-        for (i += 1; i < line.length(); i++) {
-            // exit upon comment mark
-            if (line[i] == '#') {
-                break;
-            }
-            else if (line[i] != ' ') {
-                tag.append(1, line[i]);
-            }
-        }
-    }
-    else if (line[i] != '#') {
-        return false;
-    }
-    return true;
-}
-
-static bool is_empty_line(const string& line) {
-    // empty line or comment
-    if (line.length() == 0) {
-        return true;
-    }
-    size_t i;
-    for (i = 0; i < line.length(); i++) {
-        if (line[i] == '#') {
-            break;
-        }
-        else if (line[i] != ' ') {
-            return false;
-        }
-    }
-    return true;
-}
-
-static bool retrieve_val(const string& line, string& val, string& tag) {
-    val.clear();
-    tag.clear();
-    if (line.length() == 0) {
-        return false;
-    }
-    size_t i;
-    // skip heading whitespace
-    for (i = 0; i < line.length(); i++) {
-        if (line[i] == ' ') {
-            continue;
-        }
-        else if (line[i] == '-') {
-            break;
-        }
-        else {
-            return false;
-        }
-    }
-    if (i >= line.length()) {
-        return false;
-    }
-    // check -
-    if (line[i] == '-') {
-        i++;
-    }
-    else {
-        return false;
-    }
-    // skip whitespace following -
-    for (; i < line.length(); i++) {
-        if (line[i] == ' ') {
-            continue;
-        }
-        else if (line[i] == '_' || isalnum(line[i])) {
-            break;
-        }
-        else {
-            return false;
-        }
-    }
-    if (i >= line.length()) {
-        return false;
-    }
-    // derive val name
-    val.assign(1, line[i]);
-    for (i += 1; i < line.length(); i++) {
-        if (line[i] == '_' || isalnum(line[i])) {
-            val.append(1, line[i]);
-        }
-        else if (line[i] == ':' || line[i] == ' ') {
-            break;
-        }
-        else {
-            return false;
-        }
-    }
-    if (i >= line.length()) {
-        return true;
-    }
-    // skip whitespaces (if any) following val name
-    for (; i < line.length(); i++) {
-        if (line[i] != ' ')
-            break;
-    }
-    if (i >= line.length()) {
-        return true;
-    }
-    // check for colon
-    if (line[i] == ':') {
-        // store tag and eliminate all whitespace in it
-        tag.clear();
-        for (i += 1; i < line.length(); i++) {
-            // exit upon comment mark
-            if (line[i] == '#') {
-                break;
-            }
-            else if (line[i] != ' ') {
-                tag.append(1, line[i]);
-            }
-        }
-    }
-    else if (line[i] != '#') {
-        return false;
-    }
-    return true;
-}
-
 bool Tclib::parse_cond(const std::string& src, std::list<cond_elem_t>& dst) {
     // TODO: save polish expr from the beginning?
     int i = 0;
@@ -287,6 +131,73 @@ bool Tclib::parse_cond(const std::string& src, std::list<cond_elem_t>& dst) {
     return false; // should never reach this
 }
 
+static bool retrieve_elem(const string& line, string& elem, string& tag) {
+    size_t i = 0;
+    elem.clear();
+    tag.clear();
+    if (line.length() == 0 || (line[0] != '_' && !isalnum(line[0]))) {
+        return false;
+    }
+    // derive var name
+    elem.assign(1, line[0]);
+    for (i = 1; i < line.length(); i++) {
+        if (line[i] == '_' || isalnum(line[i])) {
+            elem.append(1, line[i]);
+        }
+        else if (line[i] == ':' || line[i] == ' ') {
+            break;
+        }
+        else {
+            return false;
+        }
+    }
+    if (i >= line.length()) {
+        return true;
+    }
+    // skip whitespaces (if any) following var name
+    for (; i < line.length(); i++) {
+        if (line[i] != ' ')
+            break;
+    }
+    if (i >= line.length()) {
+        return true;
+    }
+    // check for colon
+    if (line[i] == ':') {
+        // store tag
+        tag.clear();
+        for (i += 1; i < line.length(); i++) {
+            // exit upon comment mark
+            if (line[i] == '#') {
+                break;
+            }
+            else{
+                tag.append(1, line[i]);
+            }
+        }
+        // strip heading/ending whitespace
+        tag.erase(0, tag.find_first_not_of(' '));
+        tag.erase(tag.find_last_not_of(' ') + 1);
+    }
+    else if (line[i] != '#') {
+        return false;
+    }
+    return true;
+}
+
+static bool is_empty_line(const string& line) {
+    // empty line or comment
+    for (size_t i = 0; i < line.length(); i++) {
+        if (line[i] == '#') {
+            break;
+        }
+        else if (line[i] != ' ') {
+            return false;
+        }
+    }
+    return true;
+}
+
 // yaml-like data descriptor is supported
 bool Tclib::load(const string& file_name) {
     load_log.clear();
@@ -303,14 +214,18 @@ bool Tclib::load(const string& file_name) {
     int line_num = 0;
     while (getline(ifs, line)){
         line_num++;
-        // search for empty line
-        if (line.length()==0 || line[0] == '#' || (line[0] == ' ' && is_empty_line(line))) {
+        // remove heading whitespace
+        line.erase(0, line.find_first_not_of(' '));
+
+        // skip empty lines
+        if (is_empty_line(line)) {
             continue;
         }
+
         // search for var
         else if (line[0] == '_' || isalpha(line[0])) {
             string var, tag;
-            bool status = retrieve_var(line, var, tag);
+            bool status = retrieve_elem(line, var, tag);
             if (!status) {
                 load_log.append("[LOAD ERROR] Cannot retrieve variable @line ").append(to_string(line_num)).append(": \n");
                 load_log.append(line);
@@ -335,12 +250,14 @@ bool Tclib::load(const string& file_name) {
             var_vec.emplace_back();
             var_vec.back().assign(var);
             var_vec.back().var_tag.assign(tag);
-            var_lut[var] = var_vec.size() - 1;
+            var_lut[var] = (int)var_vec.size() - 1;
         }
         // search for val
-        else if (line[0] == '-' || line[0] == ' ') {
+        else if (line[0] == '-') {
+            // remove heading '-' and following whitespace
+            line.erase(0, line.find_first_not_of("- "));
             string val, tag;
-            bool status = retrieve_val(line, val, tag);
+            bool status = retrieve_elem(line, val, tag);
             if (!status) {
                 load_log.append("[LOAD ERROR] Cannot retrieve value @line ").append(to_string(line_num)).append(": \n");
                 load_log.append(line);
@@ -365,7 +282,7 @@ bool Tclib::load(const string& file_name) {
             var_vec.back().val_vec.emplace_back();
             var_vec.back().val_vec.back().assign(val);
             var_vec.back().val_vec.back().val_tag.assign(tag);
-            var_vec.back().val_lut[val] = var_vec.back().val_vec.size() - 1;
+            var_vec.back().val_lut[val] = (int)var_vec.back().val_vec.size() - 1;
         }
         // error
         else {
